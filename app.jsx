@@ -12,16 +12,22 @@ const roles = {};
 
 function Role(props)
 {
-    const { x=0, y=0 } = props;
+    const { x=0, y=0, r=0 } = props;
     
-    return <g transform={`translate(${x},${y})`}>
+    return <g transform={`
+        translate(${x},${y})
+        rotate(${r * 360})
+    `}>
         {props.children}
     </g>;
 }
 
 roles.generic = function GenericRole(props)
 {
-    return <Role {...props}><circle r={0.5}/></Role>;
+    return <Role {...props}>
+        <line y1={0.5}/>
+        <circle r={0.5}/>
+    </Role>;
 }
 
 //////////////////////////////////////////////////////////////////////////////

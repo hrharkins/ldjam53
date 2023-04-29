@@ -12,12 +12,88 @@ const roles = {};
 
 function Role(props)
 {
-    const { x=0, y=0, r=0 } = props;
+    const { 
+        id,
+        actor,
+        now,
+        x=0, 
+        y=0, 
+        r=0, 
+        s=1, 
+        sx=1, 
+        sy=1,
+        selectable=false,
+    } = props;
+    
+    const 
+    {
+        engine,
+        selected, 
+        setSelected ,
+    } = React.useContext(Playfield.Context);
+    
+    const [ lastClick, setLastClick ] = React.useState();
+    function handleClick(event)
+    {
+        const last = lastClick;
+        setLastClick(now);
+        if (now - last < .25)
+        {
+            return;
+        }
+        console.log("SINGLE");
+        event.stopPropagation();
+        event.preventDefault();
+        const nowSelected = {
+            ...(event.shiftKey ? selected : {})
+        };
+        nowSelected[id] = event.shiftKey ? !nowSelected[id] : true;
+        console.log(nowSelected);
+        setSelected(nowSelected);
+    }
+    
+    function handleDoubleClick(event)
+    {
+        event.stopPropagation();
+        event.preventDefault();
+        const role = actor.role;
+        const group = engine.filter(
+            (check) => (check.role == role)
+        );
+        const nowSelected = { ...(event.shiftKey ? selected : {}) };
+        for (const id of Object.keys(group))
+        {
+            nowSelected[id] = event.shiftKey ? !nowSelected[id] : true;
+        }
+        console.log(nowSelected);
+        setSelected(nowSelected);
+    }
+    
+    const eventProps =
+    {
+        pointerEvents: 'bounding-box'
+    }
+    
+    if (selectable)
+    {
+        eventProps.onClick = handleClick;
+        eventProps.onDoubleClick = handleDoubleClick;
+        eventProps.cursor = 'pointer';
+    }
     
     return <g transform={`
         translate(${x},${y})
         rotate(${r * 360})
-    `}>
+        scale(${sx}, ${sy})
+    `} {...eventProps}>
+        {
+            selected[id]
+            ? <circle strokeDasharray='4 2'
+                      strokeDashoffset={`${now * 100 % 100}%`}
+                      r={1.25} strokeWidth='3'/>
+                      
+            : null
+        }
         {props.children}
     </g>;
 }
@@ -29,6 +105,186 @@ roles.generic = function GenericRole(props)
         <circle r={0.5}/>
     </Role>;
 }
+
+
+roles.soldier = function SoldierRole(props)
+{
+    const { actor: soldier } = props;
+    return <Role {...props}>
+        <g fill="grey"
+            stroke="gold"
+            strokeWidth=".2"
+        >
+            <polygon points={`
+                -.5,.3
+                .5,.3
+                .5,-.3
+                -.5,-.3
+            `}/>
+            //Body
+            <polygon points={`
+                -.25,-.25
+                .25,-.25
+                .25,.25
+                -.25,.25
+            `}
+                fill="green"
+            />
+            //Head
+            
+             <polygon points={`
+                -.5,-.3
+                -.45,-.55
+                .45,-.55
+                .5, -.3
+            `}
+            fill="brown"
+            />
+            //BackPack
+            
+            {
+                (!!soldier.holding)
+                ? (
+                    <polygon points={`
+                        .25,.3
+                        -.25,.3
+                        -.25,.8
+                        .25, .8
+                    `}
+                    fill="black"
+                    />
+                ) : (
+                    (!!soldier.sight)
+                ? (
+                    <polygon points={`
+                        .1,.3
+                        -.1,.3
+                        -.1,.8
+                        .1, .8
+                    `}
+                    fill="grey"
+                    />
+                        (!!soldier.shooting)
+                        ? (  
+                        
+                        <polygon points={`
+                                .05,.8
+                                -.05,.8
+                                -.05,3
+                                .05, 3
+                            `}
+                            fill="yellow"
+                            />
+                        ) : (null)
+                ) : (
+                    null
+                )
+                )
+            }
+        </g>
+    </Role>;
+};
+roles.enemy = function EnemyRole(props)
+{
+    const { actor: enemy } = props;
+    return <Role {...props}>
+        <g fill="orange"
+            stroke="red"
+            strokeWidth=".2"
+        >
+            <polygon points={`
+                -.5,.3
+                .5,.3
+                .5,-.3
+                -.5,-.3
+            `}/>
+            //Body
+            <polygon points={`
+                -.25,-.25
+                .25,-.25
+                .25,.25
+                -.25,.25
+            `}
+                fill="red"
+            />
+            //Head
+            
+             <polygon points={`
+                -.5,-.3
+                -.45,-.55
+                .45,-.55
+                .5, -.3
+            `}
+            fill="black"
+            />
+            //BackPack
+            
+            {
+                
+                (!!enemy.sight)
+                ? (
+                    <polygon points={`
+                        .1,.3
+                        -.1,.3
+                        -.1,.8
+                        .1, .8
+                    `}
+                    fill="grey"
+                    />
+                        (!!enemy.shooting)
+                        ? (  
+                        
+                        <polygon points={`
+                                .05,.8
+                                -.05,.8
+                                -.05,3
+                                .05, 3
+                            `}
+                            fill="yellow"
+                            />
+                        ) : (null)
+                ) : (
+                    null
+                )
+                
+            }
+        </g>
+    </Role>;
+};
+
+roles.truck = function TruckRole(props)
+{
+    const { actor: truck } = props;
+    return <Role {...props}>
+    <polygon points={`
+                .3,2
+                -.3,2
+                -.3,1.6
+                .3, 1.6
+            `}
+            fill="green"
+            />
+            //Front1
+            <polygon points={`
+                .3,1.6
+                -.3,1.6
+                -.3,1.3
+                .3, 1.3
+            `}
+            fill="Aquamarine"
+            />
+            //Front2
+            <polygon points={`
+                .3,1.3
+                -.3,1.3
+                -.3,1.15
+                .3, 1.15
+            `}
+            fill="lime"
+            />
+            //Front3
+    </Role>;
+};
 
 //////////////////////////////////////////////////////////////////////////////
 // Main application responsible for setting the stage.
@@ -81,6 +337,16 @@ function Playfield(props)
     const [ now, setNow ] = React.useState();
     const [ epoch, setEpoch ] = React.useState();
     const [ snapshot, setSnapshot ] = React.useState({});
+    const [ selected, setSelected ] = React.useState({});
+    
+    const context =
+    {
+        engine: engine,
+        selected: selected,
+        setSelected: setSelected,
+        clearSelected: () => setSelected({}),
+        addSelected: (id) => { setSelected({ ...selected, id: true })},
+    }
     
     React.useEffect(
         () =>
@@ -111,20 +377,133 @@ function Playfield(props)
         [now]
     );
     
-    return <div className="playfield-scene">
-        <svg viewBox="-11 -11 23 23" strokeWidth='1px' stroke='black' fill='none'>
-            {
-                Object.values(snapshot).map((actor, id) => 
+    function clearSelected(event)
+    {
+        console.log("CLEAR");
+        event.preventDefault();
+        event.stopPropagation();
+        if (!event.shiftKey)
+        {
+            setSelected({});
+        }            
+    }
+    
+    return <Playfield.Context.Provider value={context}>
+        <div className="playfield-scene">
+            <svg viewBox="-11 -11 23 23" strokeWidth='1px' stroke='black' fill='none'>
+                <rect x="-11" y="-11" width="23" height="23"
+                    stroke="none"
+                    pointerEvents='bounding-box'
+                    onClick={clearSelected}
+                    />
+                <g transform="scale(1, -1)">
                 {
-                    const Role = roles[actor.role];
-                    return <Role key={id} {...actor}/>;
-                })
-            }
-        </svg>
-        <div className='player-controls'>
-            <h1>Controls</h1>
+                    Object.entries(snapshot).map(([id, actor]) => 
+                    {
+                        const Role = roles[actor.role];
+                        return <Role 
+                            now={now}
+                            id={id} 
+                            key={id} 
+                            actor={actor} 
+                            {...actor}
+                        />;
+                    })
+                }
+                </g>
+            </svg>
+            <ControlPanel snapshot={snapshot} selected={selected}/>
         </div>
+    </Playfield.Context.Provider>;        
+}
+
+Playfield.Context = React.createContext();
+
+function ControlPanel(props)
+{
+    const { selected } = props;
+    
+    return <div className='player-controls'>
+        {
+            Object.keys(selected).length
+            ? <OrdersPanel {...props}/>
+            : <BlankPanel {...props}/>
+        }
     </div>;
+}
+
+const subpanels = {};
+function OrdersPanel(props)
+{
+    const { snapshot, selected } = props;
+    
+    const buckets = {};
+    for (const [id, isSelected] of Object.entries(selected))
+    {
+        if (!isSelected)
+        {
+            return;
+        }
+        const actor = snapshot[id];
+        var bucket = buckets[actor.role];
+        if (!bucket)
+        {
+            bucket = buckets[actor.role] = {};
+        }
+        bucket[id] = actor;
+    }
+    
+    return <div>
+        {
+            Object.entries(buckets).map(
+                ([role, group]) =>
+                {
+                    const Subpanel = subpanels[role];
+                    const count = Object.keys(group).length;
+                    var label;
+                    if (Subpanel == null)
+                    {
+                        label = count == 1 ? "item" : "items";
+                        return <h1>{ count } {label}</h1>;
+                    }
+                    else
+                    {
+                        label = count == 1 
+                                ? Subpanel.singular || "item"
+                                : Subpanel.plural || "items";
+                        return <div>
+                            <h1>{ count } {label}</h1>
+                            <Subpanel role={role} group={group}/>
+                        </div>;
+                    }
+                }
+            )
+        }
+    </div>
+}
+
+subpanels.soldier = function SoldersSubpanel(props)
+{
+    return <div>
+        <button>Move</button>
+        <button>Attack</button>
+        <button>Hold Position</button>
+    </div>;
+}
+subpanels.soldier.singular = 'Soldier';
+subpanels.soldier.plural = 'Soldiers';
+
+function GenericSubpanel(props)
+{
+    const { role, group } = props;
+    return <h1>{ Object.keys(group).length } Items ({role})</h1>
+}
+
+function BlankPanel(props)
+{
+    return <div>
+        <h1>...</h1>
+    </div>
 }
 
 //////////////////////////////////////////////////////////////////////////////

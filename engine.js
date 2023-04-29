@@ -33,6 +33,7 @@ class Actor
             role: this.role,
             x: this.x,
             y: this.y,
+            r: this.r,
         }
     }
 }
@@ -47,6 +48,7 @@ class TestActor extends Actor
         {
             this.y = now;
         }
+        this.r = now;
         return super.tick(now, game);
     }
 }

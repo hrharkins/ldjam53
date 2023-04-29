@@ -1,0 +1,44 @@
+body {
+    background: silver;
+}
+
+#app {
+    background: white;
+    width: 948px;
+    min-width: 948px;
+    max-width: 948px;
+    height: 433px;
+    min-height: 433px;
+    max-height: 433px;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+}
+
+.playfield-scene
+{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.playfield-scene svg
+{
+    top: 0;
+    height: 100%;
+    aspect-ratio: 3 / 2;
+}
+
+.playfield-scene svg *
+{
+    vector-effect: non-scaling-stroke;
+}
+
+.playfield-scene .player-controls
+{
+    flex: auto;
+    display: flex;
+    height: 100%;
+    border: solid 1px black;
+    padding: 0.5em;
+}

@@ -9,9 +9,9 @@ export default class LD53Game
     constructor()
     {
         this.actors.test = new TestActor().jumpTo(0, 5);
-        window.t = this.actors.solider1 = new Soldier();
-        this.actors.solider2 = new Soldier().jumpTo(5, 0);
-        this.actors.truck1 = new Truck().jumpTo(10, 0);
+        window.s1 = this.actors.solider1 = new Soldier();
+        window.s2 = this.actors.solider2 = new Soldier().jumpTo(5, 0);
+        window.t = this.actors.truck1 = new Truck().jumpTo(10, 0);
         this.actors.factory1 = new Factory().jumpTo(-7, 0);
         this.actors.barracks1 = new Barracks().jumpTo(0, -10);
     }
@@ -190,43 +190,158 @@ class PlayerUnit extends Actor
     selectable = true;
 }
 
+
+
 class Soldier extends PlayerUnit
 {
     role = 'soldier';
+    carryihg = null;
     
     tick(now)
     {
-        return super.tick(now);
+        const snapshot = super.tick(now);
+        snapshot.carrying = this.carrying;
+        return snapshot;
+    }
+    
+    grabResource(resource)
+    {
+        if (!this.carrying)
+        {
+            this.carrying = resource;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }
+
+
 
 class Truck extends PlayerUnit
 {
     role = 'truck';
+    cargo = 
+    {
+        ammo: 0,
+        food: 0,
+        material: 0,
+    }
+    maxcargo = 20;
     
     tick(now)
     {
         return super.tick(now);
     }
+    
+    isFull()
+    {
+        const cargo = this.cargo;
+        
+        return (
+            cargo.ammo 
+            + cargo.food 
+            + cargo.material
+        ) >= this.maxcargo;
+    }
+    
+    addResource(resource)
+    {
+        // Check to see if we have space, then add and return true.
+        if (this.isFull()){
+            return false;
+        }
+        else {
+            this.cargo[resource]+=1;
+            return true;
+        }
+        // Return false otherwise.
+    }
 }
+
+
 
 class Factory extends PlayerUnit
 {
     role = 'factory';
+    cargo = 
+    {
+        ammo: 0,
+        food: 0,
+        material: 0,
+    }
+    maxcargo = 100;
     
     tick(now)
     {
         return super.tick(now);
     }
+    isFull()
+    {
+        const cargo = this.cargo;
+        
+        return (
+            cargo.ammo 
+            + cargo.food 
+            + cargo.material
+        ) >= this.maxcargo;
+    }
+    
+    addResource(resource)
+    {
+        // Check to see if we have space, then add and return true.
+        if (this.isFull()){
+            return false;
+        }
+        else {
+            this.cargo[resource]+=1;
+            return true;
+        }
+        // Return false otherwise.
+    }
 }
+
+
 
 class Barracks extends PlayerUnit
 {
     role = 'barracks';
+    cargo = 
+    {
+        ammo: 0,
+        food: 0,
+        material: 0,
+    }
+    maxcargo = 100;
     
     tick(now)
     {
         return super.tick(now);
+    }
+    isFull()
+    {
+        const cargo = this.cargo;
+        
+        return (
+            cargo.ammo 
+            + cargo.food 
+            + cargo.material
+        ) >= this.maxcargo;
+    }
+    
+    addResource(resource)
+    {
+        // Check to see if we have space, then add and return true.
+        if (this.isFull()){
+            return false;
+        }
+        else {
+            this.cargo[resource]+=1;
+            return true;
+        }
+        // Return false otherwise.
     }
 }
 

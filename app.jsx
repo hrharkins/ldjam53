@@ -149,7 +149,7 @@ roles.soldier = function SoldierRole(props)
             //BackPack
             
             {
-                (!!soldier.holding)
+                (!!soldier.carrying)
                 ? (
                     <polygon points={`
                         .25,.3
@@ -157,8 +157,18 @@ roles.soldier = function SoldierRole(props)
                         -.25,.8
                         .25, .8
                     `}
-                    fill="black"
-                    />
+                    
+                    {
+                        ...(
+                            soldier.carrying == 'food'
+                            ? { fill: 'brown' }
+                            : soldier.carrying == 'material'
+                            ? { fill: 'grey' }
+                            : soldier.carrying == 'ammo'
+                            ? { fill: 'green' }
+                            : {}
+                        )
+                    }/>
                 ) : (
                     (!!soldier.sight)
                 ? (
@@ -190,6 +200,7 @@ roles.soldier = function SoldierRole(props)
         </g>
     </Role>;
 };
+
 roles.enemy = function EnemyRole(props)
 {
     const { actor: enemy } = props;
@@ -388,17 +399,17 @@ roles.barracks = function Barracks(props)
     return <Role {...props}>
             <polygon points={`
                 2.25,3.5
-                .75,3.5
-                .75,-3.5
+                1.75,3.5
+                1.75,-3.5
                 2.25,-3.5
             `}
             fill="maroon"
             />
            <polygon points={`
-                .75,3.5
+                1.75,3.5
                 -1.75,3.5
                 -1.75,-3.5
-                .75,-3.5
+                1.75,-3.5
             `}
             fill="brown"
             />

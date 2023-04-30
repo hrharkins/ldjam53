@@ -40,3 +40,44 @@ function DeltaToUR(dx, dy)
     const r = -Math.atan(slope);
     return RadiansToUR(r) + (dx < 0 ? 0.5 : 0);
 }
+
+//////////////////////////////////////////////////////////////////////////////
+// Point object
+//////////////////////////////////////////////////////////////////////////////
+class Point extends Array
+{
+    get x() { return this[0]; }
+    get y() { return this[1]; }
+    
+    constructor(x, y)
+    {
+        super(2);
+        this[0] = x;
+        this[1] = y;
+    }
+    
+    delta(x, y)
+    {
+        return new Delta((x || 0) - this[0], (y || 0) - this[1]);
+    }
+    
+    offset(x, y)
+    {
+        return new Point(this[0] + x, this[1] + y);
+    }
+}
+
+class Delta extends Array
+{
+    constructor(dx, dy)
+    {
+        super(2);
+        this[0] = dx;
+        this[1] = dy;
+    }
+    
+    get magnitude()
+    {
+        return Math.sqrt((this[0] * this[0]) + (this[1] * this[1]));
+    }
+}

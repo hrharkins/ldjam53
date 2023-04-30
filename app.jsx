@@ -1,8 +1,14 @@
 /* global React */
 /* global ReactDOM */
 /* global ReactBootstrap */
+/* global ReactBootstrapIcons */
 const RB = ReactBootstrap;
+//const RBI = ReactBootstrapIcons;
 import LD53Game from "./engine.js";
+
+// Still can't import JSX in standalone babel.  Not sure how to foce the
+// config that would be in babelrc to map jsx to react... :(
+//import TestComp from "./TestMod.jsx";
 
 //////////////////////////////////////////////////////////////////////////////
 // Actor roles -- add/change these to make display updates.
@@ -72,7 +78,7 @@ function Role(props)
     const eventProps =
     {
         pointerEvents: 'bounding-box'
-    }
+    };
     
     if (selectable)
     {
@@ -104,7 +110,7 @@ roles.generic = function GenericRole(props)
         <line y1={0.5}/>
         <circle r={0.5}/>
     </Role>;
-}
+};
 
 
 roles.soldier = function SoldierRole(props)
@@ -283,6 +289,128 @@ roles.truck = function TruckRole(props)
             fill="lime"
             />
             //Front3
+            <polygon points={`
+                .6,1.3
+                -.6,1.3
+                -.6,-2
+                .6, -2
+            `}
+            fill="grey"
+            />
+            //Back
+    </Role>;
+};
+
+roles.factory = function Factory(props)
+{
+    const { actor: factory } = props;
+    return <Role {...props}>
+                <polygon points={`
+                3.5,4.5
+                3.5,3.5
+                -3.5,3.5
+                -3.5, 4.5
+            `}
+            fill="silver"
+            />
+            <polygon points={`
+                3.5,3.5
+                3.5,2.5
+                -3.5,2.5
+                -3.5, 3.5
+            `}
+            fill="grey"
+            />
+            <polygon points={`
+                3.5,2.5
+                3.5,1.5
+                -3.5,1.5
+                -3.5, 2.5
+            `}
+            fill="silver"
+            />
+            <polygon points={`
+                3.5,1.5
+                3.5,.5
+                -3.5,.5
+                -3.5, 1.5
+            `}
+            fill="grey"
+            />
+            <polygon points={`
+                3.5,.5
+                3.5,-.5
+                -3.5,-.5
+                -3.5, .5
+            `}
+            fill="silver"
+            />
+            <polygon points={`
+                3.5,-.5
+                3.5,-1.5
+                -3.5,-1.5
+                -3.5, -.5
+            `}
+            fill="grey"
+            />
+            <polygon points={`
+                3.5,-1.5
+                3.5,-2.5
+                -3.5,-2.5
+                -3.5, -1.5
+            `}
+            fill="silver"
+            />
+            <polygon points={`
+                3.5,-2.5
+                3.5,-3.5
+                -3.5,-3.5
+                -3.5, -2.5
+            `}
+            
+            fill="grey"
+            />
+            <polygon points={`
+                3.5,-3.5
+                3.5,-4.5
+                -3.5,-4.5
+                -3.5, -3.5
+            `}
+            fill="silver"
+            />
+    </Role>;
+};
+
+
+roles.barracks = function Barracks(props)
+{
+    const { actor: barracks } = props;
+    return <Role {...props}>
+            <polygon points={`
+                2.25,3.5
+                .75,3.5
+                .75,-3.5
+                2.25,-3.5
+            `}
+            fill="maroon"
+            />
+           <polygon points={`
+                .75,3.5
+                -1.75,3.5
+                -1.75,-3.5
+                .75,-3.5
+            `}
+            fill="brown"
+            />
+            <polygon points={`
+                -1.75,3.5
+                -2.25,3.5
+                -2.25,-3.5
+                -1.75,-3.5
+            `}
+            fill="maroon"
+            />
+            
     </Role>;
 };
 
@@ -333,7 +461,7 @@ function Playfield(props)
 {
     const { roles } = props;
     const [ clock, setClock ] = React.useState({});
-    const [ engine, setEngine ] = React.useState(new LD53Game());
+    const [ engine, setEngine ] = React.useState();
     const [ now, setNow ] = React.useState();
     const [ epoch, setEpoch ] = React.useState();
     const [ snapshot, setSnapshot ] = React.useState({});
@@ -351,12 +479,20 @@ function Playfield(props)
     React.useEffect(
         () =>
         {
+            setEngine(new LD53Game());
+        },
+        []
+    );
+    
+    React.useEffect(
+        () =>
+        {
             if (!!clock)
             {
                 clearInterval(clock);
             }
             setEpoch(null);
-            setClock(setInterval(() => { setNow(Date.now() / 1000) }), 100);
+            setClock(setInterval(() => { setNow(Date.now() / 1000) }, 50));
         }, 
         [engine]
     );
@@ -424,11 +560,13 @@ function ControlPanel(props)
     const { selected } = props;
     
     return <div className='player-controls'>
+        <RB.Container fluid>
         {
             Object.keys(selected).length
             ? <OrdersPanel {...props}/>
             : <BlankPanel {...props}/>
         }
+        </RB.Container>
     </div>;
 }
 
@@ -453,7 +591,7 @@ function OrdersPanel(props)
         bucket[id] = actor;
     }
     
-    return <div>
+    return <RB.Row>
         {
             Object.entries(buckets).map(
                 ([role, group]) =>
@@ -464,31 +602,32 @@ function OrdersPanel(props)
                     if (Subpanel == null)
                     {
                         label = count == 1 ? "item" : "items";
-                        return <h1>{ count } {label}</h1>;
+                        return <h1 key={role}>{ count } {label}</h1>;
                     }
                     else
                     {
                         label = count == 1 
                                 ? Subpanel.singular || "item"
                                 : Subpanel.plural || "items";
-                        return <div>
+                        return <RB.Col key={role}>
                             <h1>{ count } {label}</h1>
                             <Subpanel role={role} group={group}/>
-                        </div>;
+                        </RB.Col>;
                     }
                 }
             )
         }
-    </div>
+    </RB.Row>
 }
 
 subpanels.soldier = function SoldersSubpanel(props)
 {
-    return <div>
-        <button>Move</button>
-        <button>Attack</button>
-        <button>Hold Position</button>
-    </div>;
+    return <RB.Row xs={3}>
+        <RB.Button className='col'>
+            <i className='bi bi-arrows-move'/>
+            Move
+        </RB.Button>
+    </RB.Row>;
 }
 subpanels.soldier.singular = 'Soldier';
 subpanels.soldier.plural = 'Soldiers';

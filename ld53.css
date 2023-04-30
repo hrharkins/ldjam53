@@ -39,6 +39,5 @@ body {
     flex: auto;
     display: flex;
     height: 100%;
-    border: solid 1px black;
-    padding: 0.5em;
+    border-left: solid 1px black;
 }

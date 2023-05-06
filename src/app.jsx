@@ -8,7 +8,7 @@ import LD53Game from "./engine.js";
 
 // Still can't import JSX in standalone babel.  Not sure how to foce the
 // config that would be in babelrc to map jsx to react... :(
-//import TestComp from "./TestMod.jsx";
+import TestComp from "./TestMod.jsx";
 
 //////////////////////////////////////////////////////////////////////////////
 // Actor roles -- add/change these to make display updates.

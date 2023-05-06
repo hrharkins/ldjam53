@@ -1,5 +1,6 @@
 
 import Directive from "./directive.js";
+import { URtoUX, URtoUY } from "./util.js";
 
 //////////////////////////////////////////////////////////////////////////////
 // Game engine -- manages the models, handles events, and produces snapshots.
@@ -195,12 +196,14 @@ class PlayerUnit extends Actor
 class Soldier extends PlayerUnit
 {
     role = 'soldier';
-    carryihg = null;
-    
+    carrying = null;
+    maxhp=10;
+    currenthp=10;
     tick(now)
     {
         const snapshot = super.tick(now);
         snapshot.carrying = this.carrying;
+        snapshot.dead = this.dead;
         return snapshot;
     }
     
@@ -215,6 +218,17 @@ class Soldier extends PlayerUnit
         {
             return false;
         }
+    }
+     takeDamage(damage)
+    {
+        // Check to see if we have health, then add and return true.
+        
+            this.currenthp-=damage;
+            
+        if (this.currenthp<=0)
+            return false;
+        else return true;
+        // Return false otherwise.
     }
 }
 

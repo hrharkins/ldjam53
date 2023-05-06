@@ -1,0 +1,16 @@
+
+version: "3.5"
+
+services:
+    app:
+        build:
+            target: react-app-dev
+            context: .
+        ports:
+            - "0.0.0.0:8080:8080"
+        volumes:
+            - "./package.json:/opt/boardmaker/package.json"
+            - "./package-lock.json:/opt/boardmaker/package-lock.json"
+            - "./webpack.config.js:/opt/boardmaker/webpack.config.js:ro"
+            - "./src/:/opt/boardmaker/src/:ro"
+            - "./public/:/opt/boardmaker/public/"
